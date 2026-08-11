@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cats vs Dogs Classifier</title>
+    <!-- Premium Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-decor decor-1"></div>
+    <div class="background-decor decor-2"></div>
+
+    <div class="container animate-fade-in">
+        <header>
+            <h1>Cats <span class="accent-text">vs</span> Dogs</h1>
+            <p class="subtitle">Deep Learning Classifier powered by PyTorch</p>
+        </header>
+
+        {% if not model_loaded %}
+        <div class="warning-banner">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+                <h3>Model weights not found!</h3>
+                <p>The server is running, but <code>cats_dogs_model.pth</code> is missing. Please run the training script (<code>python train.py</code>) first to generate the weights file.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <main class="dashboard-grid">
+            <!-- Upload Panel -->
+            <section class="card upload-card">
+                <h2>Upload an Image</h2>
+                <p class="card-desc">Drag and drop your image here, or browse files</p>
+                
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-zone-prompt">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <span>Drag & Drop image here</span>
+                        <span class="or-separator">or</span>
+                        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                </div>
+            </section>
+
+            <!-- Results Panel -->
+            <section class="card results-card" id="results-card">
+                <h2>Analysis Results</h2>
+                
+                <!-- Initial State -->
+                <div class="placeholder-state" id="placeholder-state">
+                    <p>Upload an image to see the classification analysis</p>
+                </div>
+
+                <!-- Loading State -->
+                <div class="loading-state hidden" id="loading-state">
+                    <div class="spinner"></div>
+                    <p>Running CNN Inference...</p>
+                </div>
+
+                <!-- Analysis State -->
+                <div class="analysis-state hidden" id="analysis-state">
+                    <div class="analysis-flex">
+                        <div class="image-preview-container">
+                            <img id="image-preview" src="" alt="Uploaded image preview">
+                        </div>
+                        <div class="prediction-info">
+                            <div class="main-prediction">
+                                <span class="prediction-label">Prediction</span>
+                                <span class="prediction-value" id="prediction-value">Dog</span>
+                                <span class="confidence-badge" id="confidence-badge">98.5% Match</span>
+                            </div>
+
+                            <div class="probabilities-container">
+                                <h3>Probabilities</h3>
+                                <div class="bar-group">
+                                    <div class="bar-label-row">
+                                        <span>🐱 Cat</span>
+                                        <span id="prob-cat-text">0%</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill cat-color" id="prob-cat-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="bar-group">
+                                    <div class="bar-label-row">
+                                        <span>🐶 Dog</span>
+                                        <span id="prob-dog-text">0%</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill dog-color" id="prob-dog-fill" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div class="error-state hidden" id="error-state">
+                    <p class="error-msg" id="error-message">Error processing the image.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
