@@ -10,14 +10,15 @@ An interactive, responsive web application that uses a custom PyTorch Convolutio
 
 ## Project Structure
 ```
-├── app.py           # Flask server controller
-├── model.py         # PyTorch CNN model definition
-├── train.py         # Training script (trains on training split, evaluates on test split)
+├── app.py                 # Flask server controller
+├── model.py               # PyTorch CNN model definition
+├── train.py               # Training script (trains on training split, evaluates on test split)
+├── cats_dogs_model.pth    # Saved PyTorch weights (generated after training)
 ├── templates/
-│   └── index.html   # Frontend dashboard view
+│   └── index.html         # Frontend dashboard view
 └── static/
-    ├── app.js       # Drag-and-drop AJAX uploader
-    └── style.css    # Premium glassmorphic stylesheet
+    ├── app.js             # Drag-and-drop AJAX uploader
+    └── style.css          # Premium glassmorphic stylesheet
 ```
 
 ## Setup & Running
@@ -41,3 +42,23 @@ Launch the Flask application:
 python app.py
 ```
 Open your browser and navigate to `http://localhost:5001`.
+
+---
+
+## Model & Results
+
+### CNN Architecture
+The custom CNN is built from scratch using PyTorch and consists of:
+*   **Convolutional Blocks**: 3 convolutional layers (32, 64, and 128 channels) with `ReLU` activations and `2x2 MaxPool` downsampling.
+*   **Fully Connected Classifier**: A linear layer mapping feature maps to 256 dimensions, followed by a final linear layer outputting raw logits for the 2 classes (**Cat** vs. **Dog**).
+
+### Training Details & Metrics
+The model was trained for **10 epochs** on a CPU with a 70/15/15 split of the dataset.
+
+*   **Training Loss**: ~`0.0225`
+*   **Validation Loss**: ~`1.0700`
+*   **Final Test Accuracy**: **`81.90%`** (3072 correct predictions out of 3751 test samples)
+
+### Saved Weights (`.pth`)
+*   **`cats_dogs_model.pth`**: Contains the state dictionary (learned weights and biases) of the trained CNN model.
+*   **Integration**: Upon startup, `app.py` automatically checks for this weights file. If present, it loads the parameters on the CPU (`map_location='cpu'`) and puts the network in evaluation mode (`model.eval()`) for real-time inference.
