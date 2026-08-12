@@ -6,6 +6,8 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from torch.utils.data import DataLoader, random_split
 from model import CNN
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def train_model():
     print("Setting up training for Cats vs Dogs model...")
@@ -72,15 +74,18 @@ def train_model():
         # Validation
         model.eval()
         val_running_loss = 0.0
+        print("Running validation...")
         with torch.no_grad():
-            for images, labels in valloader:
+            for val_batch_idx, (images, labels) in enumerate(valloader):
                 output = model(images)
                 loss = criterion(output, labels)
                 val_running_loss += loss.item()
+                if (val_batch_idx + 1) % 20 == 0 or (val_batch_idx + 1) == len(valloader):
+                    print(f"Validation Batch [{val_batch_idx+1}/{len(valloader)}], Loss: {loss.item():.4f}")
 
         avg_train_loss = epoch_training_loss / len(trainloader)
         avg_val_loss = val_running_loss / len(valloader)
-        print(f"--- Epoch {epoch+1} finished: Train Loss = {avg_train_loss:.4f}, Val Loss = {avg_val_loss:.4f} ---")
+        print(f"epoch : {epoch+1}/{epochs}: \n training loss = {avg_train_loss:.4f}, val loss = {avg_val_loss:.4f}")
 
     # Evaluation on Test Dataset
     print("Evaluating model on test dataset...")
@@ -88,11 +93,13 @@ def train_model():
     total = 0
     correct = 0
     with torch.no_grad():
-        for images, labels in testloader:
+        for test_batch_idx, (images, labels) in enumerate(testloader):
             outputs = model(images)
             _, predicted_val = torch.max(outputs, 1)
             correct += (predicted_val == labels).sum().item()
             total += labels.size(0)
+            if (test_batch_idx + 1) % 20 == 0 or (test_batch_idx + 1) == len(testloader):
+                print(f"Test Batch [{test_batch_idx+1}/{len(testloader)}], Accuracy so far: {correct/total:.4f}")
 
     accuracy = correct / total
     print(f"Evaluation complete. Total test samples: {total} | Correct: {correct} | Accuracy: {accuracy:.4f}")
